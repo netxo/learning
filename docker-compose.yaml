@@ -1,0 +1,48 @@
+version: "3.7"
+
+services:
+
+  mysql:
+    image: mysql:8.0-debian
+    container_name: database
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/conf:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    networks:
+      - nginxphp
+
+
+
+  webserver:
+    image: nginx:1.21.6
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/prueba
+      - ./nginx:/etc/nginx/conf.d
+    networks:
+      - nginxphp
+
+
+  php:
+    image: php:fpm-bullseye_mysqlnd
+    container_name: php
+    volumes:
+      - ./src:/var/www/prueba
+    expose:
+      - 9000
+    networks:
+      - nginxphp
+
+networks:
+  nginxphp:
+
